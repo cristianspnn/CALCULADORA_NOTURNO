@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Simples - Modo Noturno</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Define a fonte Inter para todo o corpo do documento */
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Garante que a calculadora fique centralizada verticalmente */
+            background-color: #f0f2f5; /* Cor de fundo suave (Modo Diurno) */
+            color: #333; /* Cor do texto padrão (Modo Diurno) */
+            transition: background-color 0.3s ease, color 0.3s ease; /* Transição suave para mudança de tema */
+        }
+
+        /* Contêiner da calculadora (Modo Diurno) */
+        .calculator-container {
+            background-color: #ffffff; /* Fundo branco (Modo Diurno) */
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Display da calculadora (Modo Diurno) */
+        .display {
+            background-color: #f9fafb; /* Fundo do display claro (Modo Diurno) */
+            color: #333; /* Cor do texto do display (Modo Diurno) */
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Estilos base para todos os botões da calculadora */
+        .calculator-button {
+            @apply p-4 rounded-lg shadow-md transition-all duration-200 ease-in-out text-xl font-semibold;
+        }
+
+        /* Estilos específicos para botões de operadores (Modo Diurno) */
+        .operator-button {
+            @apply bg-blue-500 text-white hover:bg-blue-600;
+        }
+        /* Estilos específicos para o botão de igual (Modo Diurno) */
+        .equals-button {
+            @apply bg-green-500 text-white hover:bg-green-600 col-span-2; /* Ocupa duas colunas */
+        }
+        /* Estilos específicos para o botão de limpar (Modo Diurno) */
+        .clear-button {
+            @apply bg-red-500 text-white hover:bg-red-600;
+        }
+        /* Estilos específicos para botões numéricos e decimal (Modo Diurno) */
+        .number-button, .decimal-button {
+            @apply bg-white text-gray-800 hover:bg-gray-100;
+        }
+        /* Estilos específicos para o botão de backspace (Modo Diurno) */
+        .backspace-button {
+            @apply bg-yellow-500 text-white hover:bg-yellow-600;
+        }
+
+        /* Estilos do botão de alternar tema (Modo Diurno) */
+        #theme-toggle {
+            @apply px-3 py-1 rounded-full text-sm font-semibold bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors duration-300;
+        }
+
+
+        /* ------------------------------------- */
+        /* Estilos do Modo Noturno (ativados pela classe 'dark-mode' no body) */
+        /* ------------------------------------- */
+
+        body.dark-mode {
+            background-color: #1a202c; /* Fundo escuro */
+            color: #e2e8f0; /* Cor do texto claro */
+        }
+
+        body.dark-mode .calculator-container {
+            background-color: #2d3748; /* Fundo mais escuro para a calculadora */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15); /* Sombra mais escura */
+        }
+
+        body.dark-mode .display {
+            background-color: #4a5568; /* Fundo do display escuro */
+            color: #e2e8f0; /* Texto do display claro */
+            border-color: #6366f1; /* Borda ao focar (pode ser ajustada) */
+        }
+
+        body.dark-mode .calculator-button {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1); /* Sombra de botão mais escura */
+            @apply hover:shadow-lg; /* Mantém o efeito de hover */
+        }
+
+        body.dark-mode .number-button,
+        body.dark-mode .decimal-button {
+            background-color: #4a5568; /* Botões numéricos escuros */
+            color: #e2e8f0; /* Texto de botões numéricos claro */
+            @apply hover:bg-gray-600;
+        }
+
+        body.dark-mode .operator-button {
+            background-color: #6366f1; /* Botões de operador roxos/azuis escuros */
+            @apply hover:bg-indigo-600;
+        }
+
+        body.dark-mode .equals-button {
+            background-color: #10b981; /* Botão de igual verde escuro */
+            @apply hover:bg-emerald-600;
+        }
+
+        body.dark-mode .clear-button {
+            background-color: #ef4444; /* Botão de limpar vermelho escuro */
+            @apply hover:bg-red-600;
+        }
+
+        body.dark-mode .backspace-button {
+            background-color: #f59e0b; /* Botão de backspace laranja escuro */
+            @apply hover:bg-amber-600;
+        }
+
+        body.dark-mode #theme-toggle {
+            background-color: #4a5568; /* Fundo do botão de alternância escuro */
+            color: #e2e8f0; /* Texto do botão de alternância claro */
+            @apply hover:bg-gray-600;
+        }
+    </style>
+</head>
+    <link rel="manifest" href="./manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Calculadora">
+    <link rel="apple-touch-icon" href="icon-192x192.png">
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="calculator-container bg-white p-6 rounded-2xl shadow-xl max-w-sm w-full mx-4">
+        <div class="flex justify-end mb-2">
+            <button id="theme-toggle">
+                Modo Noturno
+            </button>
+        </div>
+
+        <input type="text" id="display" class="display w-full h-16 text-right text-4xl mb-4 p-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400" readonly value="0">
+
+        <div class="grid grid-cols-4 gap-3">
+            <button class="calculator-button clear-button" onclick="clearDisplay()">C</button>
+            <button class="calculator-button backspace-button" onclick="backspace()">DEL</button>
+            <button class="calculator-button operator-button" onclick="appendToDisplay('/')">/</button>
+            <button class="calculator-button operator-button" onclick="appendToDisplay('*')">*</button>
+
+            <button class="calculator-button number-button" onclick="appendToDisplay('7')">7</button>
+            <button class="calculator-button number-button" onclick="appendToDisplay('8')">8</button>
+            <button class="calculator-button number-button" onclick="appendToDisplay('9')">9</button>
+            <button class="calculator-button operator-button" onclick="appendToDisplay('-')">-</button>
+
+            <button class="calculator-button number-button" onclick="appendToDisplay('4')">4</button>
+            <button class="calculator-button number-button" onclick="appendToDisplay('5')">5</button>
+            <button class="calculator-button number-button" onclick="appendToDisplay('6')">6</button>
+            <button class="calculator-button operator-button" onclick="appendToDisplay('+')">+</button>
+
+            <button class="calculator-button number-button" onclick="appendToDisplay('1')">1</button>
+            <button class="calculator-button number-button" onclick="appendToDisplay('2')">2</button>
+            <button class="calculator-button number-button" onclick="appendToDisplay('3')">3</button>
+            <button class="calculator-button equals-button" onclick="calculate()">=</button>
+
+            <button class="calculator-button number-button col-span-2" onclick="appendToDisplay('0')">0</button>
+            <button class="calculator-button decimal-button" onclick="appendToDisplay('.')">.</button>
+            <button class="calculator-button operator-button" onclick="explainCalculation()">✨ Explicar</button>
+        </div>
+    </div>
+
+    <div id="explanationModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-white p-6 rounded-lg shadow-xl max-w-md w-full mx-4 dark:bg-gray-700 dark:text-gray-100">
+            <h3 class="text-xl font-bold mb-4">Explicação do Cálculo</h3>
+            <p id="explanationContent" class="mb-4"></p>
+            <div id="loadingIndicator" class="hidden text-center">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                <p class="mt-2 text-sm">Gerando explicação...</p>
+            </div>
+            <button class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 dark:bg-indigo-500 dark:hover:bg-indigo-600" onclick="closeExplanationModal()">Fechar</button>
+        </div>
+    </div>
+
+    <script>
+        const display = document.getElementById('display');
+        let currentInput = '0';
+        let operatorClicked = false;
+
+        // Função para adicionar caracteres ao display
+        function appendToDisplay(value) {
+            // Se o display for '0' e o valor não for um operador ou decimal
+            if (currentInput === '0' && value !== '.' && !isOperator(value)) {
+                currentInput = value; // Substitui o '0'
+            } else if (isOperator(value)) {
+                // Se um operador foi clicado anteriormente, não adiciona outro
+                if (operatorClicked) {
+                    // Permite trocar o operador se o último caractere também for um operador
+                    if (isOperator(currentInput.slice(-1))) {
+                        currentInput = currentInput.slice(0, -1) + value;
+                    }
+                    return;
+                }
+                currentInput += value;
+                operatorClicked = true; // Define a flag de operador clicado
+            } else if (value === '.') {
+                // Previne múltiplos pontos decimais no número atual
+                const lastNumber = currentInput.split(/[\+\-\*\/]/).pop();
+                if (lastNumber.includes('.')) {
+                    return;
+                }
+                currentInput += value;
+                operatorClicked = false; // Resetar após ponto decimal para permitir números
+            } else {
+                currentInput += value;
+                operatorClicked = false; // Resetar após número
+            }
+            display.value = currentInput; // Atualiza o display
+        }
+
+        // Função para verificar se um caractere é um operador
+        function isOperator(char) {
+            return ['+', '-', '*', '/'].includes(char);
+        }
+
+        // Função para limpar o display
+        function clearDisplay() {
+            currentInput = '0';
+            display.value = currentInput;
+            operatorClicked = false;
+        }
+
+        // Função para apagar o último caractere
+        function backspace() {
+            currentInput = currentInput.slice(0, -1);
+            if (currentInput === '') {
+                currentInput = '0'; // Se tudo for apagado, volta para '0'
+            }
+            display.value = currentInput;
+            // Verifica se o último caractere após o backspace é um operador
+            operatorClicked = isOperator(currentInput.slice(-1));
+        }
+
+        // Função para calcular o resultado
+        function calculate() {
+            try {
+                // Substitui 'x' por '*' para que eval() funcione corretamente
+                let expression = currentInput.replace(/x/g, '*');
+                // Usa eval() para calcular o resultado da expressão
+                let result = eval(expression);
+
+                // Arredonda para evitar problemas de ponto flutuante, se necessário
+                if (Number.isFinite(result) && !Number.isInteger(result)) {
+                    result = parseFloat(result.toFixed(8)); // Limita a 8 casas decimais
+                }
+
+                currentInput = result.toString();
+                display.value = currentInput;
+                operatorClicked = false; // Reseta a flag após o cálculo
+            } catch (e) {
+                display.value = 'Erro'; // Exibe 'Erro' em caso de cálculo inválido
+                currentInput = '0'; // Reseta a entrada para '0' após o erro
+                operatorClicked = false;
+            }
+        }
+
+        // Lógica do Modo Noturno
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeToggle = document.getElementById('theme-toggle');
+            const body = document.body;
+
+            // Verifica se há uma preferência de tema salva no localStorage
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = 'Modo Diurno'; // Mude o texto do botão
+            } else {
+                themeToggle.textContent = 'Modo Noturno'; // Mantenha o texto do botão
+            }
+
+            // Adiciona um evento de clique ao botão de alternância
+            themeToggle.addEventListener('click', () => {
+                body.classList.toggle('dark-mode'); // Alterna a classe 'dark-mode' no <body>
+                if (body.classList.contains('dark-mode')) {
+                    themeToggle.textContent = 'Modo Diurno';
+                    localStorage.setItem('theme', 'dark'); // Salva a preferência
+                } else {
+                    themeToggle.textContent = 'Modo Noturno';
+                    localStorage.setItem('theme', 'light'); // Salva a preferência
+                }
+            });
+        });
+
+        // Função para explicar o cálculo usando a Gemini API
+        async function explainCalculation() {
+            const expression = display.value; // Pega o valor atual do display
+            if (expression === '0' || expression === 'Erro' || expression === '') {
+                showExplanationModal('Por favor, insira uma expressão válida ou realize um cálculo para explicar.');
+                return;
+            }
+
+            showExplanationModal('', true); // Mostrar modal com loading
+
+            try {
+                let chatHistory = [];
+                chatHistory.push({ role: "user", parts: [{ text: `Explique de forma concisa e clara o resultado da seguinte operação matemática: ${expression}.` }] });
+
+                const payload = { contents: chatHistory };
+                const apiKey = ""; // O Canvas fornecerá esta chave em tempo de execução
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const explanation = result.candidates[0].content.parts[0].text;
+                    showExplanationModal(explanation); // Mostrar explicação
+                } else {
+                    showExplanationModal('Não foi possível gerar uma explicação. Tente novamente.');
+                }
+            } catch (error) {
+                console.error('Erro ao chamar a Gemini API:', error);
+                showExplanationModal('Ocorreu um erro ao tentar explicar o cálculo. Verifique sua conexão.');
+            }
+        }
+
+        // Funções para controlar o modal de explicação
+        function showExplanationModal(content, isLoading = false) {
+            const modal = document.getElementById('explanationModal');
+            const explanationContent = document.getElementById('explanationContent');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+
+            if (isLoading) {
+                explanationContent.textContent = ''; // Limpa o conteúdo anterior
+                explanationContent.classList.add('hidden');
+                loadingIndicator.classList.remove('hidden');
+            } else {
+                explanationContent.textContent = content;
+                explanationContent.classList.remove('hidden');
+                loadingIndicator.classList.add('hidden');
+            }
+            modal.classList.remove('hidden');
+        }
+
+        function closeExplanationModal() {
+            document.getElementById('explanationModal').classList.add('hidden');
+        }
+    </script>
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./service-worker.js')
+                .then(registration => {
+                    console.log('Service Worker registrado com sucesso:', registration);
+                })
+                .catch(error => {
+                    console.error('Falha no registro do Service Worker:', error);
+                });
+        });
+    }
+</script>
+</body>
+</html>
